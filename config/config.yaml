@@ -1,0 +1,13 @@
+hdfs:
+  input_path: /user/root/pollution/input/AirQualityUCI.csv
+  output_path: /user/root/pollution/output/daily_metrics
+
+hbase:
+  host: localhost
+  port: 16010  # Updated HBase port
+  table_name: pollution_metrics
+
+spark:
+  app_name: "Pollution Analysis"
+  master: "yarn"
+  python_version: "python3"
