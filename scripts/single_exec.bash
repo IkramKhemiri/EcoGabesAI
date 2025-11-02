@@ -134,19 +134,16 @@ try:
     print("Total rows: %d" % row_count)
     print("Total columns: %d" % col_count)
     
-    print("
-Column names:")
+    print("\\nColumn names:")
     for col_name in df.columns:
         print("  - %s" % col_name)
     
     # Show sample data
-    print("
-=== Sample Data ===")
+    print("\\n=== Sample Data ===")
     df.show(5, truncate=False)
     
     # Calculate some basic statistics
-    print("
-=== Basic Statistics ===")
+    print("\\n=== Basic Statistics ===")
     numeric_cols = ["CO(GT)", "NOx(GT)", "NO2(GT)"]
     stats_df = df.select(numeric_cols).describe()
     stats_df.show()
