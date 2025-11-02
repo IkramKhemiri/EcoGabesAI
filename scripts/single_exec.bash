@@ -118,9 +118,9 @@ run_analysis() {
 from pyspark.sql import SparkSession
 
 # Create Spark session
-spark = SparkSession.builder 
-    .appName("Pollution Analysis") 
-    .config("spark.sql.adaptive.enabled", "false") 
+spark = SparkSession.builder \
+    .appName("Pollution Analysis") \
+    .config("spark.sql.adaptive.enabled", "false") \
     .getOrCreate()
 
 try:
@@ -151,6 +151,10 @@ Column names:")
     stats_df = df.select(numeric_cols).describe()
     stats_df.show()
     
+    # Create output directory in HDFS
+    from subprocess import call
+    call(["hdfs", "dfs", "-mkdir", "-p", "/user/root/pollution/output"])
+    
     # Save statistics to HDFS
     stats_df.write.mode("overwrite").csv(
         "/user/root/pollution/output/statistics", header=True)
@@ -161,6 +165,8 @@ Column names:")
     
     print("=== Analysis Complete ===")
     print("Results saved to HDFS")
+    print("Statistics saved to: /user/root/pollution/output/statistics")
+    print("Sample data saved to: /user/root/pollution/output/sample_data")
     
 except Exception as e:
     print("Error during analysis: %s" % str(e))
@@ -184,12 +190,18 @@ create_report() {
     # Ensure output directory exists
     mkdir -p /root/output
     
+    # Create a status file
+    echo "Analysis execution completed at $(date)" > /root/output/status.txt
+    echo "Check logs above for any errors" >> /root/output/status.txt
+    
     # Copy results from HDFS if they exist
     if hdfs dfs -test -d /user/root/pollution/output; then
         log "Copying results from HDFS..."
         hdfs dfs -get /user/root/pollution/output/* /root/output/ 2>/dev/null || log "Could not copy some files"
+        echo "Results copied from HDFS successfully" >> /root/output/status.txt
     else
         log "No HDFS output directory found"
+        echo "No HDFS output directory found - check for errors above" >> /root/output/status.txt
     fi
     
     # Check if we have any CSV data to analyze
